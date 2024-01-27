@@ -2,11 +2,22 @@ import ccxt
 import datetime
 import os
 from dotenv import load_dotenv
+import pandas as pd
 
 load_dotenv()
 
 API_KEY = os.getenv("API_KEY")
 API_SECRET = os.getenv("API_SECRET")
+
+# loop through the finalized csv file
+df = pd.read_csv("./vader.csv")
+
+for index, row in df.iterrows():
+    if len(row["coins"]) == 0:
+        continue
+    print(row)
+    print("---------------------")
+
 
 # Replace 'YOUR_EXCHANGE_API_KEY' and 'YOUR_EXCHANGE_SECRET' with your actual API key and secret
 exchange = ccxt.coinbasepro(

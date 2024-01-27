@@ -1,3 +1,5 @@
+# This file is just for fetching the top cryptocurrencies from coingecko
+
 import requests
 from datetime import datetime
 import pandas as pd
