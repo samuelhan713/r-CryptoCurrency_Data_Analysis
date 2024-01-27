@@ -57,3 +57,6 @@ def analyze_text():
     # axs[2].set_title("Negative")
 
     # plt.show()
+
+
+analyze_text()
