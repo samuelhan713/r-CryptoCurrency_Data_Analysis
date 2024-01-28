@@ -5,109 +5,8 @@ from dotenv import load_dotenv
 import pandas as pd
 import ast
 from collections import defaultdict
-
-TOP_CRYPTO = [
-    ("Bitcoin", "btc"),
-    ("Ethereum", "eth"),
-    ("Tether", "usdt"),
-    ("BNB", "bnb"),
-    ("Solana", "sol"),
-    ("XRP", "xrp"),
-    # ("USDC", "usdc"),
-    ("Lido Staked Ether", "steth"),
-    ("Cardano", "ada"),
-    ("Avalanche", "avax"),
-    ("Dogecoin", "doge"),
-    ("TRON", "trx"),
-    ("Polkadot", "dot"),
-    ("Chainlink", "link"),
-    # ("Toncoin", "ton"),
-    ("Polygon", "matic"),
-    ("Wrapped Bitcoin", "wbtc"),
-    ("Internet Computer", "icp"),
-    ("Shiba Inu", "shib"),
-    ("Dai", "dai"),
-    ("Litecoin", "ltc"),
-    ("Bitcoin Cash", "bch"),
-    ("Uniswap", "uni"),
-    ("LEO Token", "leo"),
-    ("Cosmos Hub", "atom"),
-    ("Ethereum Classic", "etc"),
-    ("Stellar", "xlm"),
-    ("OKB", "okb"),
-    ("NEAR Protocol", "near"),
-    ("Injective", "inj"),
-    ("Optimism", "op"),
-    ("Aptos", "apt"),
-    # ("Monero", "xmr"),
-    ("Lido DAO", "ldo"),
-    ("Celestia", "tia"),
-    ("First Digital USD", "fdusd"),
-    ("Filecoin", "fil"),
-    ("Immutable", "imx"),
-    ("Hedera", "hbar"),
-    ("Kaspa", "kas"),
-    ("Arbitrum", "arb"),
-    ("Stacks", "stx"),
-    ("Cronos", "cro"),
-    ("Bittensor", "tao"),
-    ("Mantle", "mnt"),
-    ("VeChain", "vet"),
-    ("Maker", "mkr"),
-    # ("TrueUSD", "tusd"),
-    ("Quant", "qnt"),
-    ("Sei", "sei"),
-    ("Render", "rndr"),
-    ("The Graph", "grt"),
-    ("Sui", "sui"),
-    ("Rocket Pool ETH", "reth"),
-    ("Bitcoin SV", "bsv"),
-    ("MultiversX", "egld"),
-    ("Algorand", "algo"),
-    ("Aave", "aave"),
-    ("THORChain", "rune"),
-    ("ORDI", "ordi"),
-    ("Flow", "flow"),
-    ("Mina Protocol", "mina"),
-    ("Synthetix Network", "snx"),
-    ("Helium", "hnt"),
-    ("The Sandbox", "sand"),
-    ("Chiliz", "chz"),
-    ("dYdX", "dydx"),
-    ("Tokenize Xchange", "tkx"),
-    ("Fantom", "ftm"),
-    ("Axie Infinity", "axs"),
-    ("Theta Network", "theta"),
-    # ("KuCoin", "kcs"),
-    ("Osmosis", "osmo"),
-    # ("SATS (Ordinals)", "sats"),
-    ("Astar", "astr"),
-    ("WhiteBIT Coin", "wbt"),
-    ("Beam", "beam"),
-    ("Tezos", "xtz"),
-    ("WEMIX", "wemix"),
-    ("Cheelee", "cheel"),
-    ("dYdX", "ethdydx"),
-    ("ApeCoin", "ape"),
-    ("Decentraland", "mana"),
-    ("BitTorrent", "btt"),
-    ("Bitget Token", "bgb"),
-    ("EOS", "eos"),
-    ("Blur", "blur"),
-    ("Frax Share", "fxs"),
-    # ("Manta Network", "manta"),
-    ("Conflux", "cfx"),
-    ("NEO", "neo"),
-    ("IOTA", "iota"),
-    ("Kava", "kava"),
-    ("GALA", "gala"),
-    ("USDD", "usdd"),
-    ("Bonk", "bonk"),
-    ("Klaytn", "klay"),
-    ("Oasis Network", "rose"),
-    ("Frax Ether", "frxeth"),
-    ("Flare", "flr"),
-]
+import time
+from TOP_CRYPTO import TOP_CRYPTO_TUPLES
 
 load_dotenv()
 
@@ -119,9 +18,8 @@ API_SECRET = os.getenv("API_SECRET")
 recommened_coins = {}
 df = pd.read_csv("./vader.csv")
 df_list = df.apply(lambda row: row.to_dict(), axis=1).tolist()
+average_scores = {}
 
-
-# Replace 'YOUR_EXCHANGE_API_KEY' and 'YOUR_EXCHANGE_SECRET' with your actual API key and secret
 exchange = ccxt.coinbasepro(
     {
         "apiKey": API_KEY,
@@ -153,7 +51,7 @@ def get_percent_change(symbol, start_date):
 
 
 def convert_to_ticker_format(name):
-    for full_name, ticker in TOP_CRYPTO:
+    for full_name, ticker in TOP_CRYPTO_TUPLES:
         if name.lower() == full_name.lower() or name.lower() == ticker.lower():
             return f"{ticker.upper()}/USD"
 
@@ -162,12 +60,22 @@ accumulated_scores = defaultdict(lambda: {"sum": 0, "count": 0})
 
 
 def analyze_posts():
+    empty = 0
+    df_copy_index = 0
+    df_copy = pd.DataFrame(columns=df.columns)
+
     print(len(df))
     for i in range(len(df)):
+        # if i >= len(df):
+        #     break
         cur = df.iloc[i]
         compound_score = cur["compound"]
         if cur["coins"] == "[]":
+            print("empty!")
+            empty += 1
+            # df.drop(i, inplace=True)
             continue
+        df_copy.loc[len(df_copy)] = cur
 
         # coin list
         coin_list_str = cur["coins"]
@@ -179,25 +87,29 @@ def analyze_posts():
             symbol = coin_name
             start_date = cur["created_time"]
             percent_change = get_percent_change(symbol, start_date)
-            print(
-                f"Percent Change for {symbol} since {start_date}: {percent_change:.2f}%"
-            )
 
+            # print(
+            #     f"Percent Change for {symbol} since {start_date}: {percent_change:.2f}%"
+            # )
+
+            df_copy.at[df_copy_index, "percent_change"] = percent_change
             accumulated_scores[coin_name]["sum"] += compound_score
             accumulated_scores[coin_name]["count"] += 1
+            time.sleep(1)
+        df_copy_index += 1
+
     average_scores = {
         coin_name: data["sum"] / data["count"]
         for coin_name, data in accumulated_scores.items()
     }
-    print(average_scores)
+    # print(average_scores)
+    print(df_copy)
+    print("there should be ", (len(df) - empty), "rows")
+    file_path = "final.csv"
+    df_copy.to_csv(file_path, index=False)
 
 
 analyze_posts()
-
-
-def generate_recommendation(average_scores):
-    # TODO: generate recommendation
-    return
 
 
 # Example usage
