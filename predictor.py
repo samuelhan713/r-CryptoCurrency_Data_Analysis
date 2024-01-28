@@ -24,7 +24,7 @@ def predict():
 
     preds = model.predict(test[predictors])
     preds = pd.Series(preds, index=test.index)
-    print(precision_score(test["target"], preds))
+    print("Confidence level: ", (precision_score(test["target"], preds)) * 100, "%")
 
 
 def generate_recommendation(coin_recommendations):
