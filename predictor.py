@@ -74,3 +74,4 @@ if __name__ == "__main__":
     print("Recommended crypto currencies to invest in:")
     for i in range(1, len(final_recommendations) + 1):
         print("{}. {}".format(i, final_recommendations[i - 1]))
+    predict()
