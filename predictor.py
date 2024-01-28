@@ -1,3 +1,4 @@
+# This file generates a cryptocurrency investment recommendation and the confidence score for the prediction made.
 from sklearn.ensemble import RandomForestClassifier
 import pandas as pd
 from sklearn.metrics import precision_score

@@ -1,5 +1,4 @@
-# This file
-
+# This file fetches 'hot' reddit posts from r/CryptoCurrency, formats it, and generates a CSV of the posts.
 
 # USING REDDIT API
 import requests
@@ -43,46 +42,13 @@ def fetch_post(limit=500, after=None):
     TOKEN = res.json()["access_token"]  # access token!
     headers = {**headers, **{"Authorization": f"bearer {TOKEN}"}}
 
-    # while the token is valid (~2 hours) we just add headers=headers to our requests
-    # requests.get("https://oauth.reddit.com/api/v1/me", headers=headers).json()
-
     params = {"limit": limit, "after": after}
     res = requests.get(
         "https://oauth.reddit.com/r/CryptoCurrency/hot", headers=headers, params=params
     )
 
-    # posts = []
-    # while len(posts) < 200:
-    #     # Make a request to the Pushshift API
-    #     response = requests.get(
-    #         "https://oauth.reddit.com/r/CryptoCurrency/hot",
-    #         headers=headers,
-    #         params=params,
-    #     )
-    #     # Check if the request was successful (status code 200)
-    #     if response.status_code == 50:
-    #         data = response.json()["data"]["children"]
-    #         if not data:
-    #             # No more posts available
-    #             break
-
-    #         posts.extend(data)
-    #         print(f"Downloaded {len(posts)} posts")
-
-    #         # Set the timestamp for the next request to the created_utc of the last post
-    #         # params["before"] = data[-1]["created_utc"]
-    #     else:
-    #         # Handle failed request
-    #         print(f"Request failed with status code {response.status_code}")
-    #         break
-
-    #     # Add a delay to avoid hitting API rate limits
-    #     time.sleep(1)
-
-    # print(posts)
     df = pd.DataFrame()
     data = []
-    # Loop through each post retrieved from GET request
     for post in res.json()["data"]["children"]:
         # If the body of a post is empty, then make the body the title of the post
         idx = "selftext"
@@ -108,11 +74,10 @@ def fetch_post(limit=500, after=None):
             }
         )
 
-    for d in data:  # filter all posts that have a upvote ratio < 0.5
+    for d in data:
         if not validate_post(d):
             data.remove(d)
     df = pd.concat([df, pd.DataFrame(data)], ignore_index=True)
-    # print(df)
 
     return data
 
@@ -200,5 +165,3 @@ if __name__ == "__main__":
     preprocessed_list = preprocess_text_list(
         text_list
     )  # format: (processed_text, [identifiers])
-
-    # print("preprocessed_posts: ", preprocessed_posts)

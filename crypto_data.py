@@ -1,3 +1,4 @@
+# This file fetches real-time data from the crypto market and determines the percent change of the price of a coin from the date a reddit post was made to the current date.
 import ccxt
 import datetime
 import os
@@ -13,8 +14,6 @@ load_dotenv()
 API_KEY = os.getenv("API_KEY")
 API_SECRET = os.getenv("API_SECRET")
 
-# loop through the finalized csv file
-# df = pd.read_csv("./vader.csv")
 recommened_coins = {}
 df = pd.read_csv("./vader.csv")
 df_list = df.apply(lambda row: row.to_dict(), axis=1).tolist()
@@ -30,7 +29,6 @@ exchange = ccxt.coinbasepro(
 
 
 def get_percent_change(symbol, start_date):
-    # Get current ticker price
     ticker = exchange.fetch_ticker(symbol)
 
     current_price = ticker["last"]
@@ -40,11 +38,9 @@ def get_percent_change(symbol, start_date):
     since_timestamp = exchange.parse8601(start_date)
     trades = exchange.fetch_trades(symbol, since=since_timestamp)
 
-    # Extract the trade price from the historical data for the start date
     start_price = float(trades[0]["price"])
     print("start price: ", start_price)
 
-    # Calculate percent change
     percent_change = ((start_price - current_price) / start_price) * 100
 
     return percent_change
@@ -109,9 +105,11 @@ def analyze_posts():
     df_copy.to_csv(file_path, index=False)
 
 
-analyze_posts()
+if __name__ == "__main__":
+    analyze_posts()
 
 
+# -------------For testing--------------
 # Example usage
 # symbol = "XMR/USD"  # Note the different symbol format for Coinbase Pro
 # start_date = "2024-01-25T00:00:00"  # Replace with your desired start date
