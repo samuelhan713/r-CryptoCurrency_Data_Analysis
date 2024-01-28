@@ -4,7 +4,10 @@
 1. Run ```preprocessing.py```
 2. Run ```sentiment_analysis.py```
 3. Run ```crypto_data.py```
-4. Rin ```predictor.py```
+4. Run ```predictor.py```
+
+You must have your own API keys and secret keys from the Reddit API, Coinbase Pro API, and a password for your Reddit account in a .env file.
+
 ---
 # Abstract
 I've always been interested in investing in crypto, but I never knew which currency to invest in. As a CS student, I knew I had to leverage my knowledge to easily gain insights into the best crypto currencies to invest in. This project collects data from the subreddit r/CryptoCurrency and checks what people are saying about certain cryptocurrencies, compares it to the actual crypto market, and generates a list of recommended cryptocurrencies to invest in.
