@@ -10,7 +10,7 @@ You must have your own API keys and secret keys from the Reddit API, Coinbase Pr
 
 ---
 # Abstract
-I've always been interested in investing in crypto, but I never knew which currency to invest in. As a CS student, I knew I had to leverage my knowledge to easily gain insights into the best crypto currencies to invest in. This project collects data from the subreddit r/CryptoCurrency and checks what people are saying about certain cryptocurrencies, compares it to the actual crypto market, and generates a list of recommended cryptocurrencies to invest in.
+I've always been interested in investing in crypto, but I never knew which one to invest in. As a CS student, I knew I had to leverage my knowledge to easily gain insights into the best crypto currencies to invest in. This project collects data from the subreddit r/CryptoCurrency and checks what people are saying about certain cryptocurrencies, compares it to the actual crypto market, and generates a list of recommended cryptocurrencies to invest in.
 
 You might wonder, why Reddit? My answer is, Reddit has unfiltered information from people with actual experience in investing. I could get data from well-known organizations and the news, but as you already know, the government is evil and is trying to brainwash you through mass media. Just kidding, but I think it's more insightful to hear what people are directly saying about certain crytpocurrencies than just to follow the mass media. The following are the details of each step of my project.
 
